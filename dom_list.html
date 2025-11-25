@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>인터넷활용 실습 템플릿</title>
+  
+  <style>
+    /* 기본 설정 */
+    :root {
+      --primary: #216cdc;
+      --primary-dark: #194c98;
+      --bg: #f7f9fc;
+      --text: #222222;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 2rem 1rem;
+      text-align: center;
+      background: var(--primary);
+      color: #ffffff;
+    }
+    header .subtitle { margin-top: .25rem; opacity: .95; }
+
+    nav {
+      background: var(--primary-dark);
+      display: flex;
+      gap: 1rem;
+      padding: .75rem 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: .25rem .5rem;
+    }
+    nav a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 900px;
+      margin: 1.5rem auto;
+      padding: 1rem;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    section { margin-bottom: 1rem; }
+    h1, h2, h3 { margin: .2rem 0 .6rem; }
+
+    button {
+      padding: .8rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 6px rgba(33, 108, 220, 0.3);
+      transition: all 0.2s;
+    }
+    button:hover { 
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(33, 108, 220, 0.4);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #666;
+    }
+
+    /* 메시지 스타일 댓글 영역 */
+    #commentList {
+      list-style-type: none;
+      padding: 1rem;
+      margin-top: 1rem;
+      background: #e8eef7;
+      border-radius: 12px;
+      min-height: 200px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    /* 말풍선 스타일 */
+    li {
+      position: relative;
+      background: #ffffff;
+      margin: 12px 0;
+      padding: 12px 16px 24px 16px;
+      border-radius: 18px;
+      max-width: 70%;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      animation: slideIn 0.3s ease-out;
+      transition: all 0.2s;
+    }
+
+    /* 시간 표시 */
+    .message-time {
+      position: absolute;
+      bottom: 4px;
+      right: 12px;
+      font-size: 0.7em;
+      opacity: 0.6;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 짝수번째는 오른쪽 정렬 (내가 보낸 메시지처럼) */
+    li:nth-child(even) {
+      background: #216cdc;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* 홀수번째는 왼쪽 정렬 (상대방 메시지처럼) */
+    li:nth-child(odd) {
+      background: #ffffff;
+      color: #222;
+      margin-right: auto;
+      border-bottom-left-radius: 4px;
+    }
+
+    li:hover {
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    li:hover::after {
+      content: " 🗑️";
+      font-size: 1.1em;
+      margin-left: 8px;
+    }
+
+    /* 스크롤바 스타일 */
+    #commentList::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #commentList::-webkit-scrollbar-track {
+      background: #d4dff0;
+      border-radius: 10px;
+    }
+
+    #commentList::-webkit-scrollbar-thumb {
+      background: #9bb3d8;
+      border-radius: 10px;
+    }
+
+    #commentList::-webkit-scrollbar-thumb:hover {
+      background: #7a9ac7;
+    }
+
+    /* 버튼 영역 */
+    .button-area {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.25rem; }
+      .container { margin: 1rem; padding: .75rem; }
+      li { max-width: 85%; }
+    }
+  </style>
+
+  <script>
+    function addComment() {
+      var inputStr = prompt("추가할 댓글 내용을 입력하세요:", "오늘 수업 너무 재밌어요!");
+
+      if (inputStr == null || inputStr.trim() == "") {
+        return; 
+      }
+
+      var parent = document.getElementById("commentList");
+      var newLi = document.createElement("li");
+      
+      // 현재 시간 가져오기
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var ampm = hours >= 12 ? '오후' : '오전';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0시는 12시로 표시
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      var timeStr = ampm + ' ' + hours + ':' + minutes;
+      
+      // 메시지와 시간 추가
+      newLi.innerHTML = inputStr + '<span class="message-time">' + timeStr + '</span>';
+
+      newLi.onclick = function() {
+        this.style.animation = "slideOut 0.3s ease-out";
+        setTimeout(() => {
+          var p = this.parentElement;
+          p.removeChild(this);
+        }, 250);
+      };
+
+      parent.appendChild(newLi);
+      
+      // 스크롤을 맨 아래로
+      parent.scrollTop = parent.scrollHeight;
+    }
+  </script>
+
+</head>
+<body>
+<header>
+  <h1>이름: 박나림</h1>
+  <p class="subtitle">Narim Park</p>
+</header>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+  <a href="portfolio.html">Portfolio</a>
+  <a href="contact.html">Contact</a>
+</nav>
+<main class="container">
+<section>
+    <h3>💬 댓글 목록</h3>
+    <p>아래 말풍선을 클릭하면 해당 메시지가 삭제됩니다.</p>
+    <hr>
+
+    <ul id="commentList">
+        <!-- 자바스크립트로 여기에 li가 추가됨 -->
+    </ul>
+    
+    <div class="button-area">
+      <button onclick="addComment()">💬 댓글 추가하기</button>
+    </div>
+</section>
+</main>
+<footer>
+  <small>&copy; <span id="year">2024</span> Narim Park</small>
+</footer>
+</body>
+</html>
