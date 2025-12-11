@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>키보드 자동차</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        main.container {
+            position: relative;
+            min-height: 500px;
+            border: 5px solid rgb(98, 111, 232); /* 경계선 표시 */
+            overflow: hidden; /* 스크롤바 방지 */
+        }
+
+        #car {
+            position: absolute; /* 절대 위치 지정 (필수) */
+            left: 100px;        /* 초기 x좌표 */
+            top: 100px;         /* 초기 y좌표 */
+            width: 80px; 
+            height: 40px;
+            background-color: rgb(141, 130, 238);
+            border: 2px solid black;
+            color: white; 
+            font-weight: bold; 
+            text-align: center; 
+            line-height: 40px;
+            z-index: 10;
+        }
+        
+        #info {
+            position: absolute;
+            bottom: 20px; 
+            left: 20px;
+            padding: 10px; 
+            background: #eee; 
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 5;
+        }
+
+        .instructions {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        var x = 100;
+        var y = 100;
+        var step = 10; //이동 거리
+        var borderWidth = 5; //벽 두께
+
+        window.onload = function() {
+            var car = document.getElementById("car");
+            var info = document.getElementById("info");
+            var container = document.querySelector("main.container");
+
+            document.onkeydown = function(e) {
+                //화면 크기 계산
+                var maxX = container.clientWidth - car.offsetWidth - borderWidth;
+                var maxY = container.clientHeight - car.offsetHeight - borderWidth;
+
+                //37:왼쪽, 38:위, 39:오른쪽, 40:아래
+                switch(e.keyCode) {
+                    case 37: // 왼쪽
+                        x -= step;
+                        if (x < borderWidth) x = borderWidth; //왼쪽 벽 체크
+                        break;
+                    case 38: //위쪽
+                        y -= step;
+                        if (y < borderWidth) y = borderWidth; //위쪽 벽 체크
+                        e.preventDefault(); //화면 스크롤 방지
+                        break;
+                    case 39: //오른쪽
+                        x += step;
+                        if (x > maxX) x = maxX; //오른쪽 벽 체크
+                        break;
+                    case 40: //아래쪽
+                        y += step;
+                        if (y > maxY) y = maxY; //아래쪽 벽 체크
+                        e.preventDefault(); //화면 스크롤 방지
+                        break;
+                }
+
+                car.style.left = x + "px";
+                car.style.top = y + "px";
+
+                info.innerHTML = "현재 좌표 (x, y) = (" + x + ", " + y + ")";
+            }
+        }
+    </script>
+</head>
+
+<body>
+<header>
+    <h1>이름: 박나림</h1>
+    <p class="subtitle">Narim Park</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="portfolio.html">Portfolio</a>
+    <a href="contact.html">Contact</a>
+</nav>
+
+<main class="container">
+    <section>
+        <h3>키보드 자동차</h3>
+        <hr>
+        <div class="instructions">
+            <p><strong>방향키(←, ↑, →, ↓)를 눌러 자동차를 운전해보세요!</strong></p>
+            <p>자동차는 경계선 밖으로 나갈 수 없습니다.</p>
+        </div>
+    </section>
+    
+    <div id="car">Car</div>
+    <div id="info">현재 좌표 (x, y) = (100, 100)</div>
+</main>
+
+<footer>
+    <small>&copy; <span id="year"></span> Narim Park</small>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

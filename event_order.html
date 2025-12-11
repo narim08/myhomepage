@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>스마트 피자 주문서</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+        
+        main.container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 30px auto;
+        }
+        
+        section h3 {
+            color: #4a5fc1;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        section hr {
+            border: none;
+            height: 3px;
+            background: linear-gradient(to right, #4a5fc1, #7c9ff5);
+            margin-bottom: 30px;
+        }
+        
+        /* 메뉴 박스 카드 스타일 */
+        #menu_box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: none;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(74, 95, 193, 0.15);
+        }
+        
+        #menu_box h4 {
+            color: #1976d2;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #64b5f6;
+        }
+        
+        .menu-item {
+            background: white;
+            margin: 12px 0;
+            padding: 15px;
+            text-align: left;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 95, 193, 0.3);
+        }
+        
+        .menu-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 8px;
+            accent-color: #1976d2;
+        }
+        
+        .menu-item input[type="number"] {
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            padding: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .menu-item input[type="number"]:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+        
+        .order-form {
+            text-align: left;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        
+        .form-row {
+            background: #f8fbff;
+            margin: 20px 0;
+            padding: 18px;
+            border-radius: 12px;
+            
+        }
+        
+        .form-row strong {
+            color: #1565c0;
+            font-size: 16px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        .form-row input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        
+        .form-row input[type="text"]:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+        
+        #total {
+            width: 150px;
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 18px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid #64b5f6;
+            border-radius: 8px;
+            text-align: right;
+            color: #1565c0;
+        }
+        
+        input[type="submit"], input[type="reset"] {
+            padding: 14px 32px;
+            margin: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="submit"] {
+            background: linear-gradient(135deg, #1976d2, #42a5f5);
+            color: white;
+        }
+        
+        input[type="submit"]:hover {
+            background: linear-gradient(135deg, #1565c0, #1976d2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+        }
+        
+        input[type="reset"] {
+            background: linear-gradient(135deg, #78909c, #90a4ae);
+            color: white;
+        }
+        
+        input[type="reset"]:hover {
+            background: linear-gradient(135deg, #607d8b, #78909c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(96, 125, 139, 0.4);
+        }
+        
+        input[type="submit"]:active, input[type="reset"]:active {
+            transform: translateY(0);
+        }
+    </style>
+    <script>
+        /* 기능 1: 가격 계산 함수 */
+        function recalc() {
+            var total = 0; 
+            var checks = document.getElementsByClassName("menu-check");
+            var qtys = document.getElementsByClassName("menu-qty");
+
+            for (var i = 0; i < checks.length; i++) {
+                if (checks[i].checked) { 
+                    var price = parseInt(checks[i].value);
+                    var quantity = parseInt(qtys[i].value);
+                    
+                    if (isNaN(quantity) || quantity < 1) {
+                        quantity = 1;
+                        qtys[i].value = 1;
+                    }
+                    total += price * quantity;
+                }
+            }
+            document.getElementById("total").value = total;
+        }
+
+        /* 기능 2: 주소 입력 확인 (포커스 벗어날 때) */
+        function checkAddress() {
+            var addr = document.getElementById("addr");
+            if (addr.value.trim() == "") {
+                alert("배달 받으실 주소를 반드시 입력해주세요!");
+            }
+        }
+
+        /* 기능 3: 주문 전송 제어 */
+        function validate(e) {
+            var total = parseInt(document.getElementById("total").value);
+            
+            // 메뉴 선택 확인
+            if (total == 0) {
+                alert("메뉴를 선택해 주세요.");
+                e.preventDefault();
+                return false;
+            }
+            
+            if (addr.value.trim() == "") {
+                alert("배달 받으실 주소를 반드시 입력해주세요!");
+                e.preventDefault();
+                return false;
+            }
+
+            // 주문 완료
+            alert("주문이 완료되었습니다!\n총 결제금액: " + total.toLocaleString() + "원");
+            e.preventDefault(); 
+            return false; 
+        }
+    </script>
+</head>
+
+<body>
+<header>
+    <h1>이름: 박나림</h1>
+    <p class="subtitle">Narim Park</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="portfolio.html">Portfolio</a>
+    <a href="contact.html">Contact</a>
+</nav>
+
+<main class="container">
+    <section>
+        <h3>스마트 피자 주문서 (이벤트 활용)</h3>
+        <hr>
+        
+        <div class="order-form">
+            <form action="#" onsubmit="return validate(event)">
+                
+                <div id="menu_box">
+                    <h4>[메뉴 선택]</h4>
+                    
+                    <div class="menu-item">
+                        <input type="checkbox" class="menu-check" value="15000" onchange="recalc()"> 
+                        콤비네이션 피자 (15,000원)
+                        <input type="number" class="menu-qty" value="1" min="1" style="width: 50px;" 
+                        onchange="recalc()" onkeyup="recalc()"> 개
+                    </div>
+                    
+                    <div class="menu-item">
+                        <input type="checkbox" class="menu-check" value="12000" onchange="recalc()"> 
+                        페퍼로니 피자 (12,000원)
+                        <input type="number" class="menu-qty" value="1" min="1" style="width: 50px;" 
+                        onchange="recalc()" onkeyup="recalc()"> 개
+                    </div>
+                    
+                    <div class="menu-item">
+                        <input type="checkbox" class="menu-check" value="2000" onchange="recalc()"> 
+                        치즈 토핑 추가 (2,000원)
+                        <input type="number" class="menu-qty" value="1" min="1" style="width: 50px;" 
+                        onchange="recalc()" onkeyup="recalc()"> 개
+                    </div>
+                    
+                    <div class="menu-item">
+                        <input type="checkbox" class="menu-check" value="1500" onchange="recalc()"> 
+                        콜라 1.25L (1,500원)
+                        <input type="number" class="menu-qty" value="1" min="1" style="width: 50px;" 
+                        onchange="recalc()" onkeyup="recalc()"> 개
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <strong>배달 주소:</strong> 
+                    <input type="text" id="addr" size="50" onblur="checkAddress()" 
+                    placeholder="주소를 입력하세요">
+                </div>
+
+                <div class="form-row">
+                    <strong>주문 합계:</strong> 
+                    <input type="text" id="total" value="0" readonly> 원
+                </div>
+
+                <div class="form-row">
+                    <input type="submit" value="주문하기">
+                    <input type="reset" value="초기화" onclick="setTimeout(recalc, 0)">
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <small>&copy; <span id="year"></span> Narim Park</small>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
